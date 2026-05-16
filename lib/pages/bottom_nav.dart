@@ -22,11 +22,11 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   void initState() {
+    super.initState();
     homePage = Home();
     order = Order();
     profile = Profile();
     pages = [homePage, order, profile];
-    super.initState();
   }
 
   @override
