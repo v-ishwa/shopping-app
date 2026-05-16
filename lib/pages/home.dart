@@ -183,6 +183,7 @@ class _HomeState extends State<Home> {
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
+                    margin: EdgeInsets.only(right: 20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -295,7 +296,7 @@ class CategoryTile extends StatelessWidget {
         children: [
           Image.asset(image, height: 50, width: 50, fit: BoxFit.cover),
           Icon(Icons.arrow_forward),
-        ],
+        ],   
       ),
     );
   }
