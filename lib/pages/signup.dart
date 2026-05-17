@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/pages/login.dart';
-import "../widgets/support_widget.dart";
+import './login.dart';
+import "../widgets//support_widget.dart";
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -110,7 +110,10 @@ class _SignupState extends State<Signup> {
                     style: AppWidget.lightTextStyle(),
                   ),
                   GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login())),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login()),
+                    ),
                     child: Text(
                       "Sign in",
                       style: TextStyle(
