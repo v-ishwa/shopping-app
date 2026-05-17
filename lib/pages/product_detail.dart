@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "../widgets//support_widget.dart";
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail({super.key});
@@ -38,6 +39,7 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
             Expanded(
               child: Container(
+                padding: EdgeInsets.only(top: 20, left: 20, right: 20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -46,7 +48,50 @@ class _ProductDetailState extends State<ProductDetail> {
                   ),
                 ),
                 width: MediaQuery.of(context).size.width,
-                child: Text("data"),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Headphone", style: AppWidget.boldTextStyle()),
+                        Text(
+                          "\$300",
+                          style: TextStyle(
+                            color: Color(0xfffd6f3e),
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Text("Details", style: AppWidget.semiBoldTextStyle()),
+                    SizedBox(height: 10),
+                    Text(
+                      "The Product is very good. It has a one year warranty. It even catches low frequency and has a very low latency making this a Goto Gaming Headphone ",
+                    ),
+                    SizedBox(height: 90),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Color(0xfffd6f3e),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      width: double.infinity,
+                      child: Center(
+                        child: Text(
+                          "Buy Now",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
