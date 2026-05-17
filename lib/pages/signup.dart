@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/pages/signup.dart';
-import 'package:shopping_app/widgets/support_widget.dart';
+import 'package:shopping_app/pages/login.dart';
+import "../widgets/support_widget.dart";
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class Signup extends StatefulWidget {
+  const Signup({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Signup> createState() => _SignupState();
 }
 
-class _LoginState extends State<Login> {
+class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +22,7 @@ class _LoginState extends State<Login> {
             children: [
               Image.asset("images/login.png"),
               Center(
-                child: Text("Sign In", style: AppWidget.semiBoldTextStyle()),
+                child: Text("Sign Up", style: AppWidget.semiBoldTextStyle()),
               ),
               SizedBox(height: 20),
               Center(
@@ -32,6 +32,22 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 40),
+              Text("Name", style: AppWidget.semiBoldTextStyle()),
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.only(left: 20),
+                decoration: BoxDecoration(
+                  color: Color(0xfff4f5f9),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Name",
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
               Text("Email", style: AppWidget.semiBoldTextStyle()),
               SizedBox(height: 20),
               Container(
@@ -64,20 +80,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
+
               Center(
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
@@ -88,7 +91,7 @@ class _LoginState extends State<Login> {
                   ),
                   child: Center(
                     child: Text(
-                      "Sign in",
+                      "Sign up",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -103,16 +106,13 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    "Already have an account? ",
                     style: AppWidget.lightTextStyle(),
                   ),
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Signup()),
-                    ),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login())),
                     child: Text(
-                      "Sign up",
+                      "Sign in",
                       style: TextStyle(
                         color: Colors.green,
                         fontSize: 18,
