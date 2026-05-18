@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shopping_app/pages/bottom_nav.dart';
+import 'package:shopping_app/services/database.dart';
 import './login.dart';
 import "../widgets//support_widget.dart";
 
@@ -21,11 +23,20 @@ class _SignupState extends State<Signup> {
   void signup() async {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
+    final String name = nameController.text.trim();
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
-        print('user: $userCredential');
+        // print('user: $userCredential');
+        String id = userCredential.user!.uid;
+        Map<String, dynamic> userInfoMap = {
+          "name": name,
+          "email": email,
+          "id": id,
+          "image": "https://picsum.photos/seed/picsum/200/300",
+        };
+        await DatabaseMethods().addUserInfo(userInfoMap, id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("User Registered Successfully"),

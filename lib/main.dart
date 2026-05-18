@@ -11,7 +11,7 @@ import 'package:shopping_app/pages/signup.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print("Firebase Project ID: ${Firebase.app().options.projectId}");
+  // print("Firebase Project ID: ${Firebase.app().options.projectId}");
   runApp(const MyApp());
 }
 
