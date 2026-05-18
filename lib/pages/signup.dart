@@ -12,7 +12,6 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
-  String? email, password, name;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -20,15 +19,12 @@ class _SignupState extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
 
   void signup() async {
-    final String currentEmail = emailController.text.trim();
-    final String currentPassword = passwordController.text.trim();
-    if (currentEmail.isNotEmpty && currentPassword.isNotEmpty) {
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
+    if (email.isNotEmpty && password.isNotEmpty) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: currentEmail,
-              password: currentPassword,
-            );
+            .createUserWithEmailAndPassword(email: email, password: password);
         print('user: $userCredential');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -36,24 +32,22 @@ class _SignupState extends State<Signup> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => BottomNav()),
         );
       } on FirebaseException catch (e) {
+        String errorMessage = "An Error Occurred";
+
         if (e.code == "weak-password") {
+          errorMessage = "The password provided is too weak.";
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("The password is too weak."),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
         } else if (e.code == "email-already-in-use") {
+          errorMessage = "Email already in use";
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Email Already Exists."),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
         }
       }
