@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/admin/admin_home.dart';
 import 'package:shopping_app/pages/bottom_nav.dart';
 import 'package:shopping_app/widgets/support_widget.dart';
 
@@ -15,31 +16,76 @@ class _AdminLoginState extends State<AdminLogin> {
   TextEditingController userPasswordController = TextEditingController();
 
   void adminLogin() async {
-    await FirebaseFirestore.instance.collection("admin").get().then((snapshot) {
-      for (var result in snapshot.docs) {
-        if (result.data()["username"] != userNameController.text.trim()) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Invalid Username"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        } else if (result.data()["password"] !=
-            userPasswordController.text.trim()) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Invalid Password"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNav()),
-          );
-        }
+    final String userName = userNameController.text.trim();
+    final String userPassword = userPasswordController.text.trim();
+
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection("Admin")
+          .where("username", isEqualTo: userName)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Invalid Username")));
+        return;
       }
-    });
+      final adminDoc = snapshot.docs.first.data() as Map<String, dynamic>?;
+
+      if (adminDoc?["password"] == userPassword) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Welcome Back, Admin"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminHome()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid Password"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    // await FirebaseFirestore.instance.collection("admin").get().then((snapshot) {
+    //   for (var result in snapshot.docs) {
+    //     if (result.data()["username"] != userNameController.text.trim()) {
+    //       ScaffoldMessenger.of(context).showSnackBar(
+    //         SnackBar(
+    //           content: Text("Invalid Username"),
+    //           backgroundColor: Colors.red,
+    //         ),
+    //       );
+    //     } else if (result.data()["password"] !=
+    //         userPasswordController.text.trim()) {
+    //       ScaffoldMessenger.of(context).showSnackBar(
+    //         SnackBar(
+    //           content: Text("Invalid Password"),
+    //           backgroundColor: Colors.red,
+    //         ),
+    //       );
+    //     } else {
+    //       Navigator.pushReplacement(
+    //         context,
+    //         MaterialPageRoute(builder: (context) => const AdminHome()),
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -87,12 +133,7 @@ class _AdminLoginState extends State<AdminLogin> {
                 ),
                 child: TextFormField(
                   obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter your Password";
-                    }
-                    return null;
-                  },
+
                   controller: userPasswordController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -102,6 +143,7 @@ class _AdminLoginState extends State<AdminLogin> {
               ),
               SizedBox(height: 60),
               GestureDetector(
+                onTap: () => adminLogin(),
                 child: Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width / 2,
@@ -112,7 +154,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     ),
                     child: Center(
                       child: Text(
-                        "Sign up",
+                        "Sign in",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
