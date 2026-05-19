@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
 import 'package:shopping_app/pages/bottom_nav.dart';
 import 'package:shopping_app/services/database.dart';
+import 'package:shopping_app/services/shared_pref.dart';
 import './login.dart';
 import "../widgets//support_widget.dart";
 
@@ -30,6 +30,12 @@ class _SignupState extends State<Signup> {
             .createUserWithEmailAndPassword(email: email, password: password);
         // print('user: $userCredential');
         String id = userCredential.user!.uid;
+        await SharedPreferenceHelper().saveUserId(id);
+        await SharedPreferenceHelper().saveUserName(name);
+        await SharedPreferenceHelper().saveUserEmail(email);
+        await SharedPreferenceHelper().saveUserImage(
+          "https://picsum.photos/seed/picsum/200/300",
+        );
         Map<String, dynamic> userInfoMap = {
           "name": name,
           "email": email,
