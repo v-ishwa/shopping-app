@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/admin/admin_home.dart';
-import 'package:shopping_app/pages/bottom_nav.dart';
 import 'package:shopping_app/widgets/support_widget.dart';
 
 class AdminLogin extends StatefulWidget {

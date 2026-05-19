@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/admin/add_product.dart';
 import 'package:shopping_app/admin/admin_login.dart';
 import 'package:shopping_app/firebase_options.dart';
 import 'package:shopping_app/pages/bottom_nav.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: const AdminLogin(),
+      home: AddProduct(),
       debugShowCheckedModeBanner: false,
     );
   }
