@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/pages/category_products.dart';
 import 'package:shopping_app/widgets/support_widget.dart';
 
 class Home extends StatefulWidget {
@@ -15,6 +16,8 @@ class _HomeState extends State<Home> {
     "images/watch.png",
     "images/TV.png",
   ];
+
+  List categoryName = ["Headphone", "Laptop", "Watch", "TV"];
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +112,10 @@ class _HomeState extends State<Home> {
                         itemCount: categories.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
-                          return CategoryTile(image: categories[index]);
+                          return CategoryTile(
+                            image: categories[index],
+                            name: categoryName[index],
+                          );
                         },
                       ),
                     ),
@@ -282,24 +288,34 @@ class _HomeState extends State<Home> {
 }
 
 class CategoryTile extends StatelessWidget {
-  final String image;
+  final String image, name;
 
-  const CategoryTile({super.key, required this.image});
+  const CategoryTile({super.key, required this.image, required this.name});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Image.asset(image, height: 50, width: 50, fit: BoxFit.cover),
-          Icon(Icons.arrow_forward),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryProducts(category: name),
+          ),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset(image, height: 50, width: 50, fit: BoxFit.cover),
+            Icon(Icons.arrow_forward),
+          ],
+        ),
       ),
     );
   }

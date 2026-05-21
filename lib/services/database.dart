@@ -19,4 +19,8 @@ class DatabaseMethods {
         .collection(categoryName)
         .add(productMap);
   }
+
+  Future<Stream<QuerySnapshot>> getProducts(String category) async {
+    return await FirebaseFirestore.instance.collection(category).snapshots();
+  }
 }

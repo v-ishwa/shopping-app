@@ -11,6 +11,8 @@ class AddProduct extends StatefulWidget {
 
 class _AddProductState extends State<AddProduct> {
   final TextEditingController productNameController = TextEditingController();
+  final TextEditingController productPriceController = TextEditingController();
+  final TextEditingController productDetailController = TextEditingController();
 
   // Your default local asset path string
   final String selectedImage = "images/headphone2.png";
@@ -22,27 +24,27 @@ class _AddProductState extends State<AddProduct> {
     print("button clicked");
     final String productName = productNameController.text.trim();
 
-    // Check if fields are actually filled out
     if (item != null && productName.isNotEmpty) {
       Map<String, dynamic> newProduct = {
         "name": productName,
+        "price": productPriceController.text.trim(),
+        "detail": productDetailController.text.trim(),
         "image": selectedImage,
       };
 
       try {
         print("before querying");
 
-        // Execute the database call
         await DatabaseMethods().addProduct(newProduct, item!);
 
         print("query success");
 
-        // Guard to prevent context memory leaks if user backed out of the page
         if (!mounted) return;
 
-        // FIXED: State UI resets MUST happen inside setState() to update the screen layout
         setState(() {
           productNameController.clear();
+          productPriceController.clear();
+          productDetailController.clear();
           item = null;
         });
 
@@ -53,7 +55,6 @@ class _AddProductState extends State<AddProduct> {
           ),
         );
       } catch (error) {
-        // CATCH ALL BLOCKS: If Firestore fails or times out, it tells you why here
         print("CRITICAL FIRESTORE ERROR: $error");
 
         if (!mounted) return;
@@ -92,7 +93,7 @@ class _AddProductState extends State<AddProduct> {
         title: Text("Add Product", style: AppWidget.semiBoldTextStyle()),
       ),
       body: Container(
-        margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
+        margin: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,6 +129,37 @@ class _AddProductState extends State<AddProduct> {
                 ),
                 child: TextField(
                   controller: productNameController,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text("Product Price", style: AppWidget.lightTextStyle()),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xffececf8),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: productPriceController,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text("Product Detail", style: AppWidget.lightTextStyle()),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xffececf8),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: productDetailController,
+                  maxLines: 6,
                   decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
