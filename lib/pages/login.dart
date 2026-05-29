@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/pages/bottom_nav.dart';
+import 'package:shopping_app/services/shared_pref.dart';
 import "../widgets/support_widget.dart";
 import './signup.dart';
+import '../widgets/responsive_container.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -22,12 +25,36 @@ class _LoginState extends State<Login> {
     final String password = passwordController.text.trim();
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      if (!mounted) return;
+      String id = userCredential.user!.uid;
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(id)
+          .get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        var data = userDoc.data() as Map<String, dynamic>;
+        await SharedPreferenceHelper().saveUserId(id);
+        await SharedPreferenceHelper().saveUserName(
+          data.containsKey("name") ? data["name"] : email.split('@')[0],
+        );
+        await SharedPreferenceHelper().saveUserEmail(
+          data.containsKey("email") ? data["email"] : email,
+        );
+        await SharedPreferenceHelper().saveUserImage(
+          data.containsKey("image") ? data["image"] : "boy.jpg",
+        );
+      } else {
+        // Fallback for users without a Firestore document
+        await SharedPreferenceHelper().saveUserId(id);
+        await SharedPreferenceHelper().saveUserName(email.split('@')[0]);
+        await SharedPreferenceHelper().saveUserEmail(email);
+        await SharedPreferenceHelper().saveUserImage("boy.jpg");
+      }
+
+      if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -53,6 +80,7 @@ class _LoginState extends State<Login> {
         errorMessage = "This user account has been disabled.";
       }
 
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
       );
@@ -61,147 +89,151 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey, // <-- FIXED: Added missing key assignment here
-          child: Container(
-            margin: const EdgeInsets.only(
-              top: 20,
-              left: 20,
-              right: 20,
-              bottom: 20,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset("images/login.png"),
-                Center(
-                  child: Text("Sign In", style: AppWidget.semiBoldTextStyle()),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    "Please enter the details below to\ncontinue",
-                    style: AppWidget.lightTextStyle(),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Text("Email", style: AppWidget.semiBoldTextStyle()),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfff4f5f9),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "Please enter your email";
-                      }
-                      return null;
-                    },
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Email",
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: SingleChildScrollView(
+          child: ResponsiveContainer(
+            maxWidth: 500,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Form(
+              key: _formKey, // <-- FIXED: Added missing key assignment here
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 250),
+                      child: Image.asset("images/login.png", fit: BoxFit.contain),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text("Password", style: AppWidget.semiBoldTextStyle()),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfff4f5f9),
-                    borderRadius: BorderRadius.circular(10),
+                  Center(
+                    child: Text("Sign In", style: AppWidget.semiBoldTextStyle()),
                   ),
-                  child: TextFormField(
-                    obscureText: true, // Hides password characters
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "Please enter your password";
-                      }
-                      return null;
-                    },
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Password",
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "Please enter the details below to\ncontinue",
+                      style: AppWidget.lightTextStyle(),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Colors.green.shade700,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 40),
+                  Text("Email", style: AppWidget.semiBoldTextStyle()),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter your email";
+                        }
+                        return null;
+                      },
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Email",
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        signin();
-                      }
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 2,
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(10),
+                  ),
+                  const SizedBox(height: 20),
+                  Text("Password", style: AppWidget.semiBoldTextStyle()),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextFormField(
+                      obscureText: true, // Hides password characters
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter your password";
+                        }
+                        return null;
+                      },
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Password",
                       ),
-                      child: const Center(
-                        child: Text(
-                          "Sign in",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_formKey.currentState!.validate()) {
+                          signin();
+                        }
+                      },
+                      child: Container(
+                        width: screenWidth > 500 ? 250 : screenWidth / 2,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Sign in",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: AppWidget.lightTextStyle(),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Signup()),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account? ",
+                        style: AppWidget.lightTextStyle(),
                       ),
-                      child: const Text(
-                        "Sign up",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Signup()),
+                        ),
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

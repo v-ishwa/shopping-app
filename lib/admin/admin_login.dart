@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/admin/admin_home.dart';
 import 'package:shopping_app/widgets/support_widget.dart';
+import '../widgets/responsive_container.dart';
 
 class AdminLogin extends StatefulWidget {
   const AdminLogin({super.key});
@@ -60,111 +61,94 @@ class _AdminLoginState extends State<AdminLogin> {
         ),
       );
     }
-    // await FirebaseFirestore.instance.collection("admin").get().then((snapshot) {
-    //   for (var result in snapshot.docs) {
-    //     if (result.data()["username"] != userNameController.text.trim()) {
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         SnackBar(
-    //           content: Text("Invalid Username"),
-    //           backgroundColor: Colors.red,
-    //         ),
-    //       );
-    //     } else if (result.data()["password"] !=
-    //         userPasswordController.text.trim()) {
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         SnackBar(
-    //           content: Text("Invalid Password"),
-    //           backgroundColor: Colors.red,
-    //         ),
-    //       );
-    //     } else {
-    //       Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(builder: (context) => const AdminHome()),
-    //       );
-    //     }
-    //   }
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset("images/login.png"),
-              Center(
-                child: Text(
-                  "Admin Panel",
-                  style: AppWidget.semiBoldTextStyle(),
-                ),
-              ),
-              SizedBox(height: 40),
-              Text("Username", style: AppWidget.semiBoldTextStyle()),
-              SizedBox(height: 20),
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                decoration: BoxDecoration(
-                  color: Color(0xfff4f5f9),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextFormField(
-                  controller: userNameController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Username",
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: SingleChildScrollView(
+          child: ResponsiveContainer(
+            maxWidth: 500,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 250),
+                    child: Image.asset("images/login.png", fit: BoxFit.contain),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text("Password", style: AppWidget.semiBoldTextStyle()),
-              SizedBox(height: 20),
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                decoration: BoxDecoration(
-                  color: Color(0xfff4f5f9),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextFormField(
-                  obscureText: true,
-
-                  controller: userPasswordController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Password",
+                Center(
+                  child: Text(
+                    "Admin Panel",
+                    style: AppWidget.semiBoldTextStyle(),
                   ),
                 ),
-              ),
-              SizedBox(height: 60),
-              GestureDetector(
-                onTap: () => adminLogin(),
-                child: Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(10),
+                SizedBox(height: 40),
+                Text("Username", style: AppWidget.semiBoldTextStyle()),
+                SizedBox(height: 20),
+                Container(
+                  padding: EdgeInsets.only(left: 20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextFormField(
+                    controller: userNameController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Username",
                     ),
-                    child: Center(
-                      child: Text(
-                        "Sign in",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text("Password", style: AppWidget.semiBoldTextStyle()),
+                SizedBox(height: 20),
+                Container(
+                  padding: EdgeInsets.only(left: 20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextFormField(
+                    obscureText: true,
+                    controller: userPasswordController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Password",
+                    ),
+                  ),
+                ),
+                SizedBox(height: 60),
+                GestureDetector(
+                  onTap: () => adminLogin(),
+                  child: Center(
+                    child: Container(
+                      width: screenWidth > 500 ? 250 : screenWidth / 2,
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Sign in",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

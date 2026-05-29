@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/pages/category_products.dart';
+import 'package:shopping_app/pages/login.dart';
+import 'package:shopping_app/services/shared_pref.dart';
 import 'package:shopping_app/widgets/support_widget.dart';
+import 'package:shopping_app/widgets/responsive_container.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -19,267 +23,342 @@ class _HomeState extends State<Home> {
 
   List categoryName = ["Headphone", "Laptop", "Watch", "TV"];
 
+  String name = "";
+  String image = "boy.jpg";
+
+  Future<void> getSharedPrefInfo() async {
+    name = await SharedPreferenceHelper().getUserName() ?? "";
+    image = await SharedPreferenceHelper().getUserImage() ?? "boy.jpg";
+  }
+
+  void ontheload() async {
+    await getSharedPrefInfo();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfff2f2f2),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              onPressed: () async {
+                await SharedPreferenceHelper().clearUser();
+                await FirebaseAuth.instance.signOut();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Logged out Successfully"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Login()),
+                  (route) => false,
+                );
+              },
+              icon: Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Color(0xfffd6f3e),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.logout, color: Colors.white, size: 24),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(top: 50, left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Center(
+          child: ResponsiveContainer(
+            maxWidth: 1000,
+            child: Container(
+              margin: EdgeInsets.only(top: 10, left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Hey Vishwa", style: AppWidget.boldTextStyle()),
-                      Text("Good Morning", style: AppWidget.lightTextStyle()),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Hey $name", style: AppWidget.boldTextStyle()),
+                          Text(
+                            "Good Morning",
+                            style: AppWidget.lightTextStyle(),
+                          ),
+                        ],
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          "images/boy.jpg",
+                          height: 70,
+                          width: 70,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ],
                   ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      "images/boy.jpg",
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                // width: MediaQuery.of(context).size.width,
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Search Products",
-                    hintStyle: AppWidget.lightTextStyle(),
-                    prefixIcon: Icon(Icons.search, color: Colors.black),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Categories", style: AppWidget.semiBoldTextStyle()),
-                  Text(
-                    "see all",
-                    style: TextStyle(
-                      color: Color(0xfffd6f3e),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
+                  SizedBox(height: 30),
                   Container(
-                    alignment: Alignment.center,
-                    height: 130,
-                    margin: EdgeInsets.only(right: 20),
-                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xfffd6f3e),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      "All",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Search Products",
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(
-                      height: 130,
-                      child: ListView.separated(
-                        separatorBuilder: (context, index) =>
-                            SizedBox(width: 20),
-                        physics: BouncingScrollPhysics(),
-                        itemCount: categories.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return CategoryTile(
-                            image: categories[index],
-                            name: categoryName[index],
-                          );
-                        },
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Categories", style: AppWidget.semiBoldTextStyle()),
+                      Text(
+                        "see all",
+                        style: TextStyle(
+                          color: Color(0xfffd6f3e),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: 130,
+                        margin: EdgeInsets.only(right: 20),
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Color(0xfffd6f3e),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          "All",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: SizedBox(
+                          height: 130,
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) =>
+                                SizedBox(width: 20),
+                            physics: BouncingScrollPhysics(),
+                            itemCount: categories.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              return CategoryTile(
+                                image: categories[index],
+                                name: categoryName[index],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "All Products",
+                        style: AppWidget.semiBoldTextStyle(),
+                      ),
+                      Text(
+                        "see all",
+                        style: TextStyle(
+                          color: Color(0xfffd6f3e),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    alignment: Alignment.centerLeft,
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 20,
+                      children: [
+                        Container(
+                          width: 200,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                "images/headphone2.png",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
+                              Text(
+                                "Headphones",
+                                style: AppWidget.semiBoldTextStyle(),
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "\$100",
+                                    style: TextStyle(
+                                      color: Color(0xfffd6f3e),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xfffd6f3e),
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: Icon(Icons.add, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 200,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                "images/headphone2.png",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
+                              Text(
+                                "Headphones",
+                                style: AppWidget.semiBoldTextStyle(),
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "\$100",
+                                    style: TextStyle(
+                                      color: Color(0xfffd6f3e),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xfffd6f3e),
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: Icon(Icons.add, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 200,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                "images/headphone2.png",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
+                              Text(
+                                "Headphones",
+                                style: AppWidget.semiBoldTextStyle(),
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "\$100",
+                                    style: TextStyle(
+                                      color: Color(0xfffd6f3e),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xfffd6f3e),
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: Icon(Icons.add, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("All Products", style: AppWidget.semiBoldTextStyle()),
-                  Text(
-                    "see all",
-                    style: TextStyle(
-                      color: Color(0xfffd6f3e),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Container(
-                alignment: Alignment.center,
-                height: 240,
-                child: ListView(
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(right: 20),
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "images/headphone2.png",
-                            height: 150,
-                            width: 150,
-                            fit: BoxFit.cover,
-                          ),
-                          Text(
-                            "Headphones",
-                            style: AppWidget.semiBoldTextStyle(),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                "\$100",
-                                style: TextStyle(
-                                  color: Color(0xfffd6f3e),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 40),
-                              Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Color(0xfffd6f3e),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: Icon(Icons.add, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      margin: EdgeInsets.only(right: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "images/headphone2.png",
-                            height: 150,
-                            width: 150,
-                            fit: BoxFit.cover,
-                          ),
-                          Text(
-                            "Headphones",
-                            style: AppWidget.semiBoldTextStyle(),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                "\$100",
-                                style: TextStyle(
-                                  color: Color(0xfffd6f3e),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 40),
-                              Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Color(0xfffd6f3e),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: Icon(Icons.add, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "images/headphone2.png",
-                            height: 150,
-                            width: 150,
-                            fit: BoxFit.cover,
-                          ),
-                          Text(
-                            "Headphones",
-                            style: AppWidget.semiBoldTextStyle(),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                "\$100",
-                                style: TextStyle(
-                                  color: Color(0xfffd6f3e),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 40),
-                              Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Color(0xfffd6f3e),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: Icon(Icons.add, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -306,14 +385,17 @@ class CategoryTile extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset(image, height: 50, width: 50, fit: BoxFit.cover),
-            Icon(Icons.arrow_forward),
+            Icon(
+              Icons.arrow_forward,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ],
         ),
       ),

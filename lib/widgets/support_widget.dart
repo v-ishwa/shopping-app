@@ -1,9 +1,11 @@
 import "package:flutter/material.dart";
 
+import 'package:shopping_app/main.dart';
+
 class AppWidget {
   static TextStyle boldTextStyle() {
     return TextStyle(
-      color: Colors.black,
+      color: isDarkModeNotifier.value ? Colors.white : Colors.black,
       fontWeight: FontWeight.bold,
       fontSize: 28,
     );
@@ -11,7 +13,7 @@ class AppWidget {
 
   static TextStyle lightTextStyle() {
     return TextStyle(
-      color: Colors.black54,
+      color: isDarkModeNotifier.value ? Colors.white54 : Colors.black54,
       fontSize: 20,
       fontWeight: FontWeight.w500,
     );
@@ -19,7 +21,7 @@ class AppWidget {
 
   static TextStyle semiBoldTextStyle() {
     return TextStyle(
-      color: Colors.black,
+      color: isDarkModeNotifier.value ? Colors.white : Colors.black,
       fontSize: 20,
       fontWeight: FontWeight.bold,
     );

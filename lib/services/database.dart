@@ -20,7 +20,32 @@ class DatabaseMethods {
         .add(productMap);
   }
 
-  Future<Stream<QuerySnapshot>> getProducts(String category) async {
-    return await FirebaseFirestore.instance.collection(category).snapshots();
+  Stream<QuerySnapshot> getProducts(String category) {
+    return FirebaseFirestore.instance.collection(category).snapshots();
+  }
+
+  Future<void> addOrder(Map<String, dynamic> orderInfoMap, String userId) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("Orders")
+        .add(orderInfoMap);
+  }
+
+  Stream<QuerySnapshot> getOrders(String userId) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("Orders")
+        .snapshots();
+  }
+
+  Future<void> deleteOrder(String userId, String orderId) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("Orders")
+        .doc(orderId)
+        .delete();
   }
 }

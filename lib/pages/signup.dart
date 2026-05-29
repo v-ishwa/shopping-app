@@ -4,7 +4,8 @@ import 'package:shopping_app/pages/bottom_nav.dart';
 import 'package:shopping_app/services/database.dart';
 import 'package:shopping_app/services/shared_pref.dart';
 import './login.dart';
-import "../widgets//support_widget.dart";
+import "../widgets/support_widget.dart";
+import '../widgets/responsive_container.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -43,6 +44,7 @@ class _SignupState extends State<Signup> {
           "image": "https://picsum.photos/seed/picsum/200/300",
         };
         await DatabaseMethods().addUserInfo(userInfoMap, id);
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("User Registered Successfully"),
@@ -58,11 +60,13 @@ class _SignupState extends State<Signup> {
 
         if (e.code == "weak-password") {
           errorMessage = "The password provided is too weak.";
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
         } else if (e.code == "email-already-in-use") {
           errorMessage = "Email already in use";
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
@@ -73,151 +77,161 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Container(
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset("images/login.png"),
-                Center(
-                  child: Text("Sign Up", style: AppWidget.semiBoldTextStyle()),
-                ),
-                SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    "Please enter the details below to\n                    continue",
-                    style: AppWidget.lightTextStyle(),
-                  ),
-                ),
-                SizedBox(height: 40),
-                Text("Name", style: AppWidget.semiBoldTextStyle()),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: Color(0xfff4f5f9),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter your name";
-                      }
-                      return null;
-                    },
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Name",
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: SingleChildScrollView(
+          child: ResponsiveContainer(
+            maxWidth: 500,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 250),
+                      child: Image.asset("images/login.png", fit: BoxFit.contain),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Text("Email", style: AppWidget.semiBoldTextStyle()),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: Color(0xfff4f5f9),
-                    borderRadius: BorderRadius.circular(10),
+                  Center(
+                    child: Text("Sign Up", style: AppWidget.semiBoldTextStyle()),
                   ),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter your email";
-                      }
-                      return null;
-                    },
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Email",
+                  SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "Please enter the details below to\ncontinue",
+                      style: AppWidget.lightTextStyle(),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Text("Password", style: AppWidget.semiBoldTextStyle()),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  decoration: BoxDecoration(
-                    color: Color(0xfff4f5f9),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextFormField(
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter your Password";
-                      }
-                      return null;
-                    },
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Password",
+                  SizedBox(height: 40),
+                  Text("Name", style: AppWidget.semiBoldTextStyle()),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                GestureDetector(
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      signup();
-                    }
-                  },
-                  child: Center(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 2,
-                      padding: EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(10),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your name";
+                        }
+                        return null;
+                      },
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Name",
                       ),
-                      child: Center(
-                        child: Text(
-                          "Sign up",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text("Email", style: AppWidget.semiBoldTextStyle()),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your email";
+                        }
+                        return null;
+                      },
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Email",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text("Password", style: AppWidget.semiBoldTextStyle()),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextFormField(
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your Password";
+                        }
+                        return null;
+                      },
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Password",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  GestureDetector(
+                    onTap: () {
+                      if (_formKey.currentState!.validate()) {
+                        signup();
+                      }
+                    },
+                    child: Center(
+                      child: Container(
+                        width: screenWidth > 500 ? 250 : screenWidth / 2,
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Sign up",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already have an account? ",
-                      style: AppWidget.lightTextStyle(),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Login()),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an account? ",
+                        style: AppWidget.lightTextStyle(),
                       ),
-                      child: Text(
-                        "Sign in",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Login()),
+                        ),
+                        child: Text(
+                          "Sign in",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -45,4 +45,24 @@ class SharedPreferenceHelper {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userImageKey);
   }
+
+  static String userThemeKey = "USERTHEMEKEY";
+
+  Future<bool> saveTheme(bool isDark) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool(userThemeKey, isDark);
+  }
+
+  Future<bool> getTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(userThemeKey) ?? false;
+  }
+
+  Future<void> clearUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(userIdKey);
+    await prefs.remove(userNameKey);
+    await prefs.remove(userEmailKey);
+    await prefs.remove(userImageKey);
+  }
 }
